@@ -1,9 +1,9 @@
 package com.yangsi.exchangeratecalculator.domain;
 
 public enum ExchangeRate {
-    USDKRW("USDKRW", "한국(KRW)", "KRW/USD"),
-    USDJPY("USDJPY", "일본(JPY)", "JPY/USD"),
-    USDPHP("USDPHP", "필리핀(PHP)", "PHP/USD");
+    USDKRW("USDKRW", "KRW", "KRW/USD"),
+    USDJPY("USDJPY", "JPY", "JPY/USD"),
+    USDPHP("USDPHP", "PHP", "PHP/USD");
 
     private final String key;
     private final String country;
@@ -17,5 +17,9 @@ public enum ExchangeRate {
 
     public String getKey() {
         return key;
+    }
+
+    public String getCountry() {
+        return country;
     }
 }

@@ -2,34 +2,36 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>환율계산기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 <body>
 <h1> 환율계산</h1>
 
-<form role="form" id="content" action="/getReceivableAmount" method="GET">
-    <div id="remittance">
-        송금국가 : <span th:text="|${remittanceCountry.name}(${remittanceCountry.code})|"></span>
+<form id="content" th:action="@{/getReceivableAmount}" th:object="${exchangeForm}" method="GET">
+    <div class="form-group" id="remittance">
+        송금국가 : <span th:field="*{remittance}" th:value="${remittanceCountry.code}"
+                     th:text="|${remittanceCountry.name}(${remittanceCountry.code})|"></span>
+        <input id="remittance_country" type="hidden" th:value="${remittanceCountry.code}" name="remittance"/>
     </div>
 
-    <div id="recipient">
-        수취국가 : <select id="recipient_country" name="recipient">
+    <div class="form-group" id="recipient">
+        수취국가 : <select th:field="*{recipient}" id="recipient_country" name="recipient">
         <option th:each="country : ${recipientCountries}" th:value="${country.code}"
                 th:text="|${country.name} (${country.code})|"></option>
     </select>
     </div>
 
-    <div id="exchangeRate">
-        환율 :
-        <span id="exchange">1,190.05</span>
+    <div class="form-group" id="exchangeRate">
+        환율 : <span id="exchange">0</span>
         <span id="rateCode" th:text="|${recipientCountries[0].code}/${remittanceCountry.code}|"></span>
-
         <input type="hidden" name="exchange"/>
     </div>
 
-    <div id="remittanceAmount">
-        송금액 :
-        <input type="number" name="remittanceAmount"/>
+    <div class="form-group" id="remittanceAmount">
+        송금액 : <input type="number" name="remittanceAmount"/>
         <span th:text="${remittanceCountry.code}"></span>
     </div>
 
@@ -41,5 +43,38 @@
     수취금액은 111,993,00 KRW 입니다.
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+        integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
+        integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        getExchangeRate();
+        $("#recipient_country").change(function () {
+            getExchangeRate();
+        });
+    });
+
+    function getExchangeRate() {
+        $.ajax({
+            type: "GET",
+            url: "/exchangeRates",
+            data: {
+                "remittance": $("#remittance_country").val(),
+                "recipient": $("#recipient_country").val(),
+            }, success: function (data) {
+                $("#exchange").text(data.exchangeRate)
+                $("#rateCode").text(data.recipient + "/" + data.remittance)
+            }, error: function (e) {
+                console.log(e);
+            }
+        });
+    }
+</script>
 </body>
 </html>

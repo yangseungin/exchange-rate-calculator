@@ -2,7 +2,7 @@ package com.yangsi.exchangeratecalculator.controller;
 
 import com.yangsi.exchangeratecalculator.domain.ExchangeRate;
 import com.yangsi.exchangeratecalculator.dto.ExchangeApiResponse;
-import com.yangsi.exchangeratecalculator.dto.ExchangeData;
+import com.yangsi.exchangeratecalculator.dto.ExchangeDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,12 +32,15 @@ public class ExchangeRateController {
     private final RestTemplate restTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @GetMapping("/data")
+    @GetMapping("/exchangeRates")
     @ResponseBody
-    public List<ExchangeData> data() {
+    public ExchangeDTO.Response exchangeRates(ExchangeDTO.Request request) {
         return Arrays.stream(ExchangeRate.values())
-                .map(exchangeRate -> new ExchangeData(exchangeRate.getKey(), (Double) redisTemplate.opsForHash().get("exchange", exchangeRate.getKey())))
-                .collect(Collectors.toList());
+                .filter(exchangeRate -> exchangeRate.getCountry().equals(request.getRecipient()))
+                .map(exchangeRate -> new ExchangeDTO.Response(request.getRemittance(),
+                        request.getRecipient(),
+                        exchangeRateFormat(redisTemplate.opsForHash().get("exchange", exchangeRate.getKey()))))
+                .collect(Collectors.toList()).get(0);
 
     }
 
@@ -46,6 +49,10 @@ public class ExchangeRateController {
         ExchangeApiResponse result = apiCall();
         saveRedis(result);
         return result.getQuotes().toString();
+    }
+
+    private String exchangeRateFormat(Object val) {
+        return new DecimalFormat("#,###.00").format(val);
     }
 
     private ExchangeApiResponse apiCall() {
