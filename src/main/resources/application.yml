@@ -7,3 +7,7 @@ spring:
       enabled: true
   thymeleaf:
     cache: false
+
+api:
+  url: https://api.apilayer.com/currency_data/live
+  key: 5PVYUj2T4JuKj1eYwQtYA1AXItwYnBy9
