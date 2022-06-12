@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static com.yangsi.exchangeratecalculator.util.FormatUtils.exchangeRateFormat;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,10 +50,6 @@ public class ExchangeRateController {
         ExchangeApiResponse result = apiCall();
         saveRedis(result);
         return result.getQuotes().toString();
-    }
-
-    private String exchangeRateFormat(Object val) {
-        return new DecimalFormat("#,###.00").format(val);
     }
 
     private ExchangeApiResponse apiCall() {

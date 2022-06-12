@@ -1,7 +1,7 @@
 package com.yangsi.exchangeratecalculator.controller;
 
-import com.yangsi.exchangeratecalculator.domain.CountryEnum;
 import com.yangsi.exchangeratecalculator.dto.ExchangeDTO;
+import com.yangsi.exchangeratecalculator.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +14,10 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class ExchangeController {
 
-    @PostMapping("/exchange")
-    public ResponseEntity<ExchangeDTO.Response> receivableAmount(@RequestBody @Valid ExchangeDTO.Request request) {
-        //TODO 환율계산로직 추가
+    private final ExchangeService exchangeService;
 
-        return ResponseEntity.ok().body(new ExchangeDTO.Response("143.44", CountryEnum.일본.getCode()));
+    @PostMapping("/exchange")
+    public ResponseEntity<ExchangeDTO.Response> exchange(@RequestBody @Valid ExchangeDTO.Request request) {
+        return ResponseEntity.ok().body(exchangeService.exchangeMoney(request));
     }
 }

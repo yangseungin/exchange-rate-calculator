@@ -30,4 +30,11 @@ public enum CountryEnum {
                 .collect(Collectors.toList());
     }
 
+    public static CountryEnum getCountry(String code) {
+        return Arrays.stream(values())
+                .filter(countryEnum -> countryEnum.code.equals(code))
+                .findFirst()
+                .get();
+    }
+
 }
