@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>환율계산기</title>
+</head>
+<body>
+<h1> 환율계산</h1>
+
+<form role="form" id="content" action="/getReceivableAmount" method="GET">
+    <div id="remittance">
+        송금국가 : <span th:text="|${remittanceCountry.name}(${remittanceCountry.code})|"></span>
+    </div>
+
+    <div id="recipient">
+        수취국가 : <select id="recipient_country" name="recipient">
+        <option th:each="country : ${recipientCountries}" th:value="${country.code}"
+                th:text="|${country.name} (${country.code})|"></option>
+    </select>
+    </div>
+
+    <div id="exchangeRate">
+        환율 :
+        <span id="exchange">1,190.05</span>
+        <span id="rateCode" th:text="|${recipientCountries[0].code}/${remittanceCountry.code}|"></span>
+
+        <input type="hidden" name="exchange"/>
+    </div>
+
+    <div id="remittanceAmount">
+        송금액 :
+        <input type="number" name="remittanceAmount"/>
+        <span th:text="${remittanceCountry.code}"></span>
+    </div>
+
+    <button type="submit">SUBMIT</button>
+</form>
+
+<br>
+<div id="result" style="display: none">
+    수취금액은 111,993,00 KRW 입니다.
+</div>
+
+</body>
+</html>
