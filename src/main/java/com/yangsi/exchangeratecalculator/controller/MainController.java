@@ -14,7 +14,6 @@ public class MainController {
     public String home(Model model) {
         model.addAttribute("remittanceCountry", CountryEnum.remittanceCountry());
         model.addAttribute("recipientCountries", CountryEnum.recipientCountries());
-
         return "index";
     }
 }

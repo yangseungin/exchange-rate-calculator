@@ -10,37 +10,36 @@
 <body>
 <h1> 환율계산</h1>
 
-<form id="content" th:action="@{/getReceivableAmount}" th:object="${exchangeForm}" method="GET">
-    <div class="form-group" id="remittance">
-        송금국가 : <span th:field="*{remittance}" th:value="${remittanceCountry.code}"
+<form id="exchangeForm" th:action="@{/exchange}" method="POST">
+    <div class="form-group" id="remittanceDiv">
+        송금국가 : <span th:value="${remittanceCountry.code}"
                      th:text="|${remittanceCountry.name}(${remittanceCountry.code})|"></span>
         <input id="remittance_country" type="hidden" th:value="${remittanceCountry.code}" name="remittance"/>
     </div>
 
-    <div class="form-group" id="recipient">
-        수취국가 : <select th:field="*{recipient}" id="recipient_country" name="recipient">
+    <div class="form-group" id="recipientDiv">
+        수취국가 : <select id="recipient_country" name="recipient">
         <option th:each="country : ${recipientCountries}" th:value="${country.code}"
                 th:text="|${country.name} (${country.code})|"></option>
     </select>
     </div>
 
-    <div class="form-group" id="exchangeRate">
+    <div class="form-group" id="exchangeRateDiv">
         환율 : <span id="exchange">0</span>
-        <span id="rateCode" th:text="|${recipientCountries[0].code}/${remittanceCountry.code}|"></span>
-        <input type="hidden" name="exchange"/>
+        <span id="rateCode" th:text="|${recipientCountries[0].code} / ${remittanceCountry.code}|"></span>
     </div>
 
-    <div class="form-group" id="remittanceAmount">
-        송금액 : <input type="number" name="remittanceAmount"/>
+    <div class="form-group" id="remittanceAmountDiv">
+        송금액 : <input id="remittanceAmount" type="number" name="remittanceAmount"/>
         <span th:text="${remittanceCountry.code}"></span>
     </div>
 
-    <button type="submit">SUBMIT</button>
+    <button id="exchangeButton" type="submit">SUBMIT</button>
 </form>
 
 <br>
-<div id="result" style="display: none">
-    수취금액은 111,993,00 KRW 입니다.
+<div id="resultDiv" style="display: none">
+    수취금액은 <span id="resultValue">111,993,00</span> <span id="resultCurrency">KRW</span> 입니다.
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
@@ -52,12 +51,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
     $(document).ready(function () {
         getExchangeRate();
+
         $("#recipient_country").change(function () {
             getExchangeRate();
         });
+
+        $("#exchangeForm").submit(function (e) {
+            e.preventDefault();
+            exchange();
+        });
+
+
     });
 
     function getExchangeRate() {
@@ -75,6 +82,28 @@
             }
         });
     }
+
+    function exchange() {
+        $.ajax({
+            type: "POST",
+            url: "/exchange",
+            contentType: "application/json",
+            data: JSON.stringify({
+                "remittance": $("#remittance_country").val(),
+                "recipient": $("#recipient_country").val(),
+                "exchangeRate": $("#exchange").text(),
+                "remittanceAmount": $("#remittanceAmount").val(),
+            }), success: function (response) {
+                $("#resultDiv").show();
+                $("#resultValue").text(response.resultValue)
+                $("#resultCurrency").text(response.resultCurrency)
+            }, error: function (e) {
+                $("#resultDiv").hide();
+                console.log(e);
+            }
+        });
+    }
+
 </script>
 </body>
 </html>

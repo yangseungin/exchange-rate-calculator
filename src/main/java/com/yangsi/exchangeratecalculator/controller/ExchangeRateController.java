@@ -2,7 +2,7 @@ package com.yangsi.exchangeratecalculator.controller;
 
 import com.yangsi.exchangeratecalculator.domain.ExchangeRate;
 import com.yangsi.exchangeratecalculator.dto.ExchangeApiResponse;
-import com.yangsi.exchangeratecalculator.dto.ExchangeDTO;
+import com.yangsi.exchangeratecalculator.dto.ExchangeRateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
@@ -34,10 +34,10 @@ public class ExchangeRateController {
 
     @GetMapping("/exchangeRates")
     @ResponseBody
-    public ExchangeDTO.Response exchangeRates(ExchangeDTO.Request request) {
+    public ExchangeRateDTO.Response exchangeRates(ExchangeRateDTO.Request request) {
         return Arrays.stream(ExchangeRate.values())
                 .filter(exchangeRate -> exchangeRate.getCountry().equals(request.getRecipient()))
-                .map(exchangeRate -> new ExchangeDTO.Response(request.getRemittance(),
+                .map(exchangeRate -> new ExchangeRateDTO.Response(request.getRemittance(),
                         request.getRecipient(),
                         exchangeRateFormat(redisTemplate.opsForHash().get("exchange", exchangeRate.getKey()))))
                 .collect(Collectors.toList()).get(0);
