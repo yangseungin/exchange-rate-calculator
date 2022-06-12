@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 public class ExchangeController {
 
     @PostMapping("/exchange")
-    public ResponseEntity<ExchangeDTO.Response> receivableAmount(@RequestBody ExchangeDTO.Request request) {
+    public ResponseEntity<ExchangeDTO.Response> receivableAmount(@RequestBody @Valid ExchangeDTO.Request request) {
         //TODO 환율계산로직 추가
 
         return ResponseEntity.ok().body(new ExchangeDTO.Response("143.44", CountryEnum.일본.getCode()));

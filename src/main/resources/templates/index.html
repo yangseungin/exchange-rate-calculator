@@ -42,6 +42,10 @@
     수취금액은 <span id="resultValue">111,993,00</span> <span id="resultCurrency">KRW</span> 입니다.
 </div>
 
+<div id="errorDiv" style="display: none">
+    <span id="errorMessage"></span>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
         integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
         crossorigin="anonymous"></script>
@@ -95,11 +99,13 @@
                 "remittanceAmount": $("#remittanceAmount").val(),
             }), success: function (response) {
                 $("#resultDiv").show();
+                $("#errorDiv").hide();
                 $("#resultValue").text(response.resultValue)
                 $("#resultCurrency").text(response.resultCurrency)
             }, error: function (e) {
                 $("#resultDiv").hide();
-                console.log(e);
+                $("#errorDiv").show();
+                $("#errorMessage").text(e.responseJSON.errors[0].defaultMessage);
             }
         });
     }
